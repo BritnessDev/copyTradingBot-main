@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Copy Trader</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+    body {
+      padding: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <div id="app" >
+    <div class="row">
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="usr">Master Address</label>
+          <input type="text" class="form-control" placeholder="You should put Master address" v-model="masterAddr" id="usr">
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="blockkey">BlockNative Key</label>
+          <input type="text" class="form-control" placeholder="You should put BlockNative Key" v-model="blockKey" id="blockKey">
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="usr">Your Address:</label>
+          <input type="text" class="form-control" placeholder="You should put Your address" v-model="walletAddr" id="usr">
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="pwd">Private Key:</label>
+          <input type="password" class="form-control" placeholder="You should put Private Key" v-model="privateKey" id="pwd">
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="form-group">
+          <label for="pwd">Node URL:</label>
+          <input type="text" class="form-control" v-model="nodeURL" id="nodeURL">
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="pwd">Range From:</label>
+      <input type="number" Placeholder="0.0" v-model="rangeFrom" class="short-input">
+      <label for="pwd">Range Till:</label>
+      <input type="number" Placeholder="0.0" v-model="rangeTill" class="short-input">
+      
+      <button class="btn btn-primary" @click="setBotStatus()">{{botStatus}}</button>
+    </div>
+    <div class="token-list">
+      <table class="table table-striped">
+        <thead>
+          <tr style="width:200px;">
+            <th>Type</th>
+            <th>TokenIn</th>
+            <th>TokenOut</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Transaction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in fullData">
+            <td>{{item.type}}</td>
+            <td>{{item.tokenIn}}</td>
+            <td>{{item.tokenOut}}</td>
+            <td>{{item.action}}</td>
+            <td>{{item.price}}</td>
+            <td><a v-bind:href="'https://etherscan.io/tx/' + item.transaction">{{item.transaction}}</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    // Set the initial setting for the bot to snipe the token.
+    var app = new Vue({
+      el: '#app',
+      data: {
+        wss: null,
+        botStatus    : 'Start Bot',
+        walletAddr   : '',
+        privateKey   : '',
+        nodeURL      : 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        masterAddr   : '',
+        blockKey     : '',
+        fullData     : [],
+        rangeFrom    : 0.8,
+        rangeTill    : 1.2
+      },
+      methods: {
+        setBotStatus() {
+          if (this.walletAddr !== "" &&
+            this.privateKey !== "" &&
+            this.masterAddr !== "" &&
+            this.blockKey !== ""
+          ) {
+            var obj = {}
+            if (this.botStatus === "Start Bot") {
+              obj = { botStatus: true, 
+                walletAddr: this.walletAddr, 
+                privateKey: this.privateKey,
+                nodeURL: this.nodeURL,
+                blockKey  : this.blockKey, 
+                masterAddr: this.masterAddr,
+                rangeFrom: this.rangeFrom.toString(), 
+                rangeTill: this.rangeTill.toString()
+              };
+              this.botStatus = "Stop Bot"
+            } else {
+              obj = { botStatus: false };
+              this.botStatus = "Start Bot"
+            }
+            var str = JSON.stringify(obj);
+            this.wss.send(str);
+          } else {
+            alert("Please fill form!")
+          }
+        }
+      },
+      mounted() {
+        if ("WebSocket" in window) {
+          var wss = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect/");
+          this.wss = wss;
+          wss.onopen = () => {
+            this.botStatus = "Start Bot"
+            wss.send("connectRequest")
+          };
+
+          wss.onmessage = (evt) => {
+            var msg = evt.data
+            var obj = JSON.parse(msg);
+            if (obj.botStatus !== undefined) {
+              if (obj.botStatus === true)
+                this.botStatus = "Stop Bot"
+              else
+                this.botStatus = "Start Bot"
+            } else {
+            this.fullData.push({
+                type: obj.type,
+                tokenIn: obj.tokenIn,
+                tokenOut: obj.tokenOut,
+                action: obj.action,
+                price: obj.price,
+                transaction: obj.transaction
+              })
+            }
+          };
+          wss.onclose = () => {
+            console.log('winsocket closed')
+            this.wss = null;
+            this.botStatus = "Start Bot"
+          };
+        } else {
+          console.log("WebSocket NOT supported by your Browser!");
+        }
+      }
+    })
+
+
+  </script>
+  <style>
+    .short-input {
+      width: 10%;
+      margin: 7px;
+    }
+  </style>
+</body>
+
+</html>

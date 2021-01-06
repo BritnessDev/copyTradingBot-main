@@ -1,0 +1,25 @@
+{
+  "name": "trading-bot",
+  "version": "1.0.0",
+  "description": "1) The bot uses a wallet address and see phrase - this needs to be the **FIRST ACCOUNT** (Account0 by default) that was created by default when you installed metamask on your pc / macbook. \r     - if this is **NOT** configured correctly you will get an error that says \"(node:45320) UnhandledPromiseRejectionWarning: Error: insufficient funds for intrinsic transaction cost\"",
+  "main": "copytrading.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "start http://localhost:9999 && node copytrading.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bnc-sdk": "^3.7.1",
+    "chalk": "^4.1.1",
+    "ethereumjs-tx": "^2.1.2",
+    "ethers": "^5.1.4",
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "url": "^0.11.0",
+    "web3": "^1.7.0"
+  }
+}

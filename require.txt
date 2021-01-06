@@ -1,0 +1,31 @@
+its very simple. there is a wallet which i want to copytrade. it buys token on uniswap and sushiswap, its both univ2 protokoll
+so we just monitor wallet tx and filter these tx to copytrade
+we have blacklist with token contracts like DAI USDT USDC and so on cause these trades not interesting
+master wallet always using WETH to buy and sell back to WETH
+the value of master wallet trades is mostly between 0.1 and 5 eth
+but i dont want copy trade 1:1 as its suspicious then. so i need parameter to set. i was thinking about range faktor
+
+for example set range faktor to 0.8-1.2 then our script choose random number between 0.8 and 1.2 and multiply with tolen amount from master wallet trade
+
+master wallet buys 1000 token xy, our random faktor is 0.9 so we buy just 900 token xy
+
+so i need 2 variables range_from and range_till for example 0.8 and 1.2.
+
+
+Require:
+Using Uniswap
+monitoring transactions
+blacklist DAI USDT USDC
+WETH and token
+range_from range_till random
+
+0x7ff36ab5
+0000000000000000000000000000000000000000000009341052562403000000
+0000000000000000000000000000000000000000000000000000000000000080
+00000000000000000000000013307b8854a95946b54a904100afd0767a7a577b
+000000000000000000000000000000000000000000000000000000006216b0c1
+0000000000000000000000000000000000000000000000000000000000000002
+000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
+00000000000000000000000006576eb3b212d605b797dc15523d9dc9f4f66db4
+
+0x18cbafe5000000000000000000000000000000000000000000000878358d61fda198000000000000000000000000000000000000000000000000000056b61f540546bf5b00000000000000000000000000000000000000000000000000000000000000a00000000000000000000000006e90ae41af1dea6f0006aa7752d9db2cf5e6a49f000000000000000000000000000000000000000000000000000000006216b1cc00000000000000000000000000000000000000000000000000000000000000020000000000000000000000004691937a7508860f876c9c0a2a617e7d9e945d4b000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2
